@@ -1,5 +1,5 @@
 
-export const HOST = "http://localhost:3005";
+export const HOST = "https://chat-vista-1291.vercel.app/";
 
 const AUTH_ROUTE = `${HOST}/api/auth`;
 
