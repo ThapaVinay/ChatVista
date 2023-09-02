@@ -1,18 +1,62 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useStateProvider } from "@/context/StateContext";
 import Input from "@/components/common/Input";
 import Avatar from "@/components/common/Avatar";
+import axios from "axios";
+import { ONBOARD_USER_ROUTE } from "@/utils/ApiRoutes";
+import { useRouter } from "next/router";
+import { reducerCases } from "@/context/constants";
 
 function onboarding() {
 
-  const [{ userInfo }] = useStateProvider();
+  const router = useRouter();
+  const [{ userInfo, newUser }, dispatch] = useStateProvider();
   const [name, setName] = useState(userInfo?.name || "");
   const [about, setAbout] = useState("");
   const [image, setImage] = useState("/default_avatar.png");
 
-  const onboardUserHandler = async () => {
+  useEffect(()=>{
+    if(!newUser && !userInfo?.email) router.push("/login");
 
+    else if (!newUser && userInfo?.email) router.push("/");
+
+  }, [newUser, userInfo, router])
+
+  const onboardUserHandler = async () => {
+    if (validateDetails()) {
+      const email = userInfo.email;
+      try {
+        const { data } = await axios.post(ONBOARD_USER_ROUTE, {
+          email, name, about, image
+        });
+
+        if (data.status) {
+          dispatch({
+            type: reducerCases.SET_NEW_USER, newUser: false
+          });
+
+          dispatch({
+            type: reducerCases.SET_USER_INFO,
+            userInfo: {
+              id:data.id, name, email, profileImage:image, status: about,
+            },
+          });
+          router.push("/");
+        }
+
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }
+  }
+
+  const validateDetails = () => {
+    if (name < 3) {
+      return false;
+    }
+    return true;
   }
 
   return <div className="bg-panel-header-background h-screen w-screen text-white flex flex-col items-center justify-center">
