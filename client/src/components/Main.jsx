@@ -7,6 +7,7 @@ import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
 import Router, { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import Chat from "./Chat/Chat";
 import ChatList from "./Chatlist/ChatList";
 import Empty from "./Empty";
 
@@ -58,7 +59,8 @@ function Main() {
 
     <div className="grid grid-cols-main h-screen max-h-screen w-screen max-w-full ">
       <ChatList />
-      <Empty />
+      {/* <Empty /> */}
+      <Chat/>
     </div>
 
   </>;

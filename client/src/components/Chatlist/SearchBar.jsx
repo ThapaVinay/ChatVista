@@ -10,8 +10,7 @@ function SearchBar() {
       </div>
 
       <div>
-        <input type="text" placeholder="search or start a new chat" className="bg-transparent text-sm focus:outline-none text-white w-full "
-          
+        <input type="text" placeholder="search or start a new chat" className="bg-transparent text-sm focus:outline-none text-white w-full "  
         />
       </div>
     </div>
