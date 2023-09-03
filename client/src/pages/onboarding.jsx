@@ -17,8 +17,11 @@ function onboarding() {
   const [image, setImage] = useState("/default_avatar.png");
 
   useEffect(()=>{
-    if(!newUser && !userInfo?.email) router.push("/login");
-
+    if(!newUser && !userInfo?.email) 
+    {
+      console.log(userInfo);
+      router.push("/login");
+    }
     else if (!newUser && userInfo?.email) router.push("/");
 
   }, [newUser, userInfo, router])
@@ -39,7 +42,7 @@ function onboarding() {
           dispatch({
             type: reducerCases.SET_USER_INFO,
             userInfo: {
-              id:data.id, name, email, profileImage:image, status: about,
+              id:data.user.id, name, email, profileImage:image, status: about,
             },
           });
           router.push("/");
