@@ -14,7 +14,7 @@ import Empty from "./Empty";
 function Main() {
 
   const router = useRouter();
-  const [{ userInfo }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
 
 
@@ -59,8 +59,9 @@ function Main() {
 
     <div className="grid grid-cols-main h-screen max-h-screen w-screen max-w-full ">
       <ChatList />
-      {/* <Empty /> */}
-      <Chat/>
+      {
+        currentChatUser ? <Chat/> : <Empty/>
+      }
     </div>
 
   </>;
