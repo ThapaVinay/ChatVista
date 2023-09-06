@@ -10,3 +10,4 @@ export const GET_ALL_CONTACTS = `${AUTH_ROUTE}/get-contacts`;
 
 
 export const ADD_MESSAGE_ROUTE = `${MESSAGES_ROUTE }/add-message`;
+export const GET_MESSAGE_ROUTE = `${MESSAGES_ROUTE }/get-messages`;

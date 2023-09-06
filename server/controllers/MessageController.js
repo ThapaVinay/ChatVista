@@ -24,4 +24,50 @@ export const addMessage = async (req, res, next) => {
     catch (err) {
         next(err);
     }
+};
+
+export const getMessages = async (req, res, next) => {
+    try {
+        const prisma = getPrismaInstance();
+        const { from, to } = req.params;
+
+        const messages = await prisma.messages.findMany({
+            where: {
+                OR: [
+                    {
+                        senderId: parseInt(from),
+                        recieverId: parseInt(to),
+                    },
+                    {
+                        senderId: parseInt(to),
+                        recieverId: parseInt(from),
+                    },
+                ],
+            },
+            orderBy: {
+                id: "asc",
+            },
+        });
+
+        const unreadMessages = [];
+        messages.forEach((message, index) => {
+            if (message.messageStatus !== "read" && message.senderId == parseInt(to)) {
+                messages[index].messageStatus = "read";
+                unreadMessages.push(message.id);
+            }
+        });
+
+        await prisma.messages.updateMany({
+            where: {
+                id: { in: unreadMessages },
+            },
+            data: { messageStatus: "read" },
+        });
+
+        res.status(200).json({ messages });
+
+    }
+    catch (err) {
+        next(err);
+    }
 }
