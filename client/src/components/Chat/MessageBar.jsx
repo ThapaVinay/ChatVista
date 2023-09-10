@@ -26,13 +26,14 @@ function MessageBar() {
         from: userInfo?.id,
         message: data.message,
       });
+      
       dispatch({
         type:reducerCases.ADD_MESSAGE,
         newMessage: {
           ...data.message
         },
         fromSelf: true,
-      })
+      });
       setMessage("");
 
     } catch (err) {

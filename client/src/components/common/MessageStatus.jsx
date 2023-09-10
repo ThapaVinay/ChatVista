@@ -7,7 +7,7 @@ function MessageStatus({ messageStatus }) {
     {messageStatus === "delivered" && <BsCheckAll className="text-lg" />}
     {messageStatus === "read" && <BsCheckAll className="text-lg text-icon-ack" />}
   </>
-    ;
+
 }
 
 export default MessageStatus;
