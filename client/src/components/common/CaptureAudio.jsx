@@ -3,6 +3,10 @@ import React, { useRef, useState, useEffect } from "react";
 import { FaMicrophone, FaPauseCircle, FaPlay, FaStop, FaTrash } from "react-icons/fa";
 import { MdSend } from "react-icons/md";
 import WaveSurfer from 'wavesurfer.js';
+import axios from "axios";
+import { reducerCases } from "@/context/constants";
+import { ADD_AUDIO_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
+
 
 function CaptureAudio({ hide }) {
 
@@ -94,8 +98,6 @@ function CaptureAudio({ hide }) {
       mediaRecorderRef.current.addEventListener("stop", () => {
         const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
         const audioFile = new File([audioBlob], "recording.mp3");
-        console.log("audiotype", typeof audioFile, recordedAudio);
-
         setrenderedAudio(audioFile);
       });
     }
@@ -108,6 +110,7 @@ function CaptureAudio({ hide }) {
     setcurrentPlaybackTime(0);
     settotalDuration(0);
     setIsRecording(true);
+    setRecordedAudio(null);
 
     navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
       const mediaRecorder = new MediaRecorder(stream);
@@ -116,12 +119,11 @@ function CaptureAudio({ hide }) {
 
       const chunks = [];
       mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
-      
+
       mediaRecorder.onstop = () => {
         const blob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
         const audioURL = URL.createObjectURL(blob);
         const audio = new Audio(audioURL);
-        console.log("audiotypex", typeof audio,audio);
         setRecordedAudio(audio);
         waveform.load(audioURL);
       };
@@ -137,10 +139,6 @@ function CaptureAudio({ hide }) {
       const updatePlaybackTime = () => {
         setcurrentPlaybackTime(recordedAudio.currentTime);
       };
-
-      console.log("recordedAudio:", recordedAudio);
-      console.log("Type of recordedAudio:", typeof recordedAudio);
-
       recordedAudio.addEventListener("timeupdate", updatePlaybackTime);
 
       return () => {
@@ -150,7 +148,38 @@ function CaptureAudio({ hide }) {
   }, [recordedAudio]);
 
   const sendRecording = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("audio", renderedAudio);
+      const response = await axios.post(ADD_AUDIO_MESSAGE_ROUTE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        params: {
+          from: userInfo.id,
+          to: currentChatUser.id,
+        }
+      });
+      if (response.status === 201) {
+        socket.current.emit("send-msg", {
+          to: currentChatUser?.id,
+          from: userInfo?.id,
+          message: response.data.message,
+        });
 
+        dispatch({
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
+            ...response.data.message
+          },
+          fromSelf: true,
+        });
+      }
+
+    }
+    catch (err) {
+      console.log(err);
+    }
   }
 
   const formatTime = (time) => {
