@@ -11,10 +11,11 @@ import EmojiPicker from "emoji-picker-react";
 import PhotoPicker from "../common/PhotoPicker";
 import dynamic from "next/dynamic";
 
-const CaptureAudio  = dynamic(() => import("../common/CaptureAudio"), {ssr:false});
+const CaptureAudio = dynamic(() => import("../common/CaptureAudio"), {
+  ssr: false,
+});
 
 function MessageBar() {
-
   const [{ userInfo, currentChatUser, socket }, dispatch] = useStateProvider();
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -24,9 +25,10 @@ function MessageBar() {
 
   const photoPickerChange = async (e) => {
     try {
-      const file = e.target.files[0];
+      const fileInput = e.target.files[0];
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", fileInput);
+
       const response = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -34,7 +36,7 @@ function MessageBar() {
         params: {
           from: userInfo.id,
           to: currentChatUser.id,
-        }
+        },
       });
       if (response.status === 201) {
         socket.current.emit("send-msg", {
@@ -46,58 +48,60 @@ function MessageBar() {
         dispatch({
           type: reducerCases.ADD_MESSAGE,
           newMessage: {
-            ...response.data.message
+            ...response.data.message,
           },
           fromSelf: true,
         });
       }
-
-    }
-    catch (err) {
+    } catch (err) {
       console.log(err);
     }
   };
 
   const handleEmojiModel = () => {
     setShowEmojiPicker(!showEmojiPicker);
-  }
+  };
 
   const handleEmojiClick = (emoji) => {
-    setMessage((prevMessage) => (prevMessage += emoji.emoji))
-  }
+    setMessage((prevMessage) => (prevMessage += emoji.emoji));
+  };
 
   useEffect(() => {
     if (grabPhoto) {
       const data = document.getElementById("photo-picker");
       data.click();
       document.body.onfocus = (e) => {
-        setGrabPhoto(false);
-      }
+        setTimeout(() => {
+          setGrabPhoto(false);
+        }, [1000]);
+      };
     }
-  }, [grabPhoto])
+  }, [grabPhoto]);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (event.target.id !== "emoji-open") {
-        if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+        if (
+          emojiPickerRef.current &&
+          !emojiPickerRef.current.contains(event.target)
+        ) {
           setShowEmojiPicker(false);
         }
       }
-    }
+    };
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
       document.removeEventListener("click", handleOutsideClick);
-    }
-
-  }, [])
+    };
+  }, []);
 
   const sendMessage = async () => {
     try {
       const { data } = await axios.post(ADD_MESSAGE_ROUTE, {
         to: currentChatUser?.id,
         from: userInfo?.id,
-        message
+        message,
       });
 
       socket.current.emit("send-msg", {
@@ -109,12 +113,11 @@ function MessageBar() {
       dispatch({
         type: reducerCases.ADD_MESSAGE,
         newMessage: {
-          ...data.message
+          ...data.message,
         },
         fromSelf: true,
       });
       setMessage("");
-
     } catch (err) {
       console.log(err);
     }
@@ -122,25 +125,27 @@ function MessageBar() {
 
   return (
     <div className="bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
-      {
-        !showAudioRecorder &&
+      {!showAudioRecorder && (
         <>
           <div className="flex gap-6">
-            <BsEmojiSmile className="text-panel-header-icon cursor-pointer text-xl"
+            <BsEmojiSmile
+              className="text-panel-header-icon cursor-pointer text-xl"
               title="Emoji"
               id="emoji-open"
               onClick={handleEmojiModel}
             />
 
-            {showEmojiPicker &&
-              <div className="absolute bottom-24 left-16 z-40"
+            {showEmojiPicker && (
+              <div
+                className="absolute bottom-24 left-16 z-40"
                 ref={emojiPickerRef}
               >
                 <EmojiPicker onEmojiClick={handleEmojiClick} theme="dark" />
               </div>
-            }
+            )}
 
-            <ImAttachment className="text-panel-header-icon cursor-pointer text-xl"
+            <ImAttachment
+              className="text-panel-header-icon cursor-pointer text-xl"
               title="Attach file"
               onClick={() => setGrabPhoto(true)}
             />
@@ -151,32 +156,33 @@ function MessageBar() {
               type="text"
               placeholder="type a message"
               className="bg-input-background text-sm focus:outline-none rounded-lg text-white h-10 px-5 py-4 w-full"
-              onChange={e => setMessage(e.target.value)}
+              onChange={(e) => setMessage(e.target.value)}
               value={message}
             />
           </div>
 
           <div className="flex w-10 items-center justify-center">
-
             <button>
-              {
-                message.length ? (
-                  <MdSend className="text-panel-header-icon cursor-pointer text-xl" title="Send message"
-                    onClick={sendMessage}
-                  />
-                ) : (
-                  <FaMicrophone className="text-panel-header-icon cursor-pointer text-xl" title="Record"
-                    onClick={() => setShowAudioRecorder(true)}
-                  />
-                )}
+              {message.length ? (
+                <MdSend
+                  className="text-panel-header-icon cursor-pointer text-xl"
+                  title="Send message"
+                  onClick={sendMessage}
+                />
+              ) : (
+                <FaMicrophone
+                  className="text-panel-header-icon cursor-pointer text-xl"
+                  title="Record"
+                  onClick={() => setShowAudioRecorder(true)}
+                />
+              )}
             </button>
           </div>
         </>
-      }
+      )}
 
       {grabPhoto && <PhotoPicker onChange={photoPickerChange} />}
       {showAudioRecorder && <CaptureAudio hide={setShowAudioRecorder} />}
-
     </div>
   );
 }

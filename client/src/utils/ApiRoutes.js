@@ -1,5 +1,5 @@
 
-export const HOST = "https://testing-opal-seven.vercel.app";
+export const HOST = "http://localhost:3005";
 
 const AUTH_ROUTE = `${HOST}/api/auth`;
 const MESSAGES_ROUTE = `${HOST}/api/messages`;

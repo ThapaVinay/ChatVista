@@ -83,7 +83,7 @@ function Main() {
   useEffect(() => {
     const getMessages = async () => {
       const { data: { messages }, } = await axios.get(
-        `${GET_MESSAGE_ROUTE}/${userInfo.id}/${currentChatUser.id}`
+        `${GET_MESSAGE_ROUTE}/${userInfo?.id}/${currentChatUser.id}`
       );
       dispatch({ type: reducerCases.SET_MESSAGES, messages })
 
