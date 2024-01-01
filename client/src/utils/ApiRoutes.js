@@ -1,5 +1,5 @@
 
-export const HOST = "https://chat-vista-nhp6.vercel.app";
+export const HOST = "https://chat-vista-server.vercel.app";
 
 const AUTH_ROUTE = `${HOST}/api/auth`;
 const MESSAGES_ROUTE = `${HOST}/api/messages`;
