@@ -11,9 +11,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  const params = {};
-  res.status(200).render("LoginPage.html", params);
+app.use("/", (req, res) => {
+  res.json({ message: "hello welcome" });
 });
 
 app.use("/uploads/images", express.static("uploads/images"));
