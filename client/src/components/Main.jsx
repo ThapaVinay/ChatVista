@@ -11,11 +11,12 @@ import { io } from "socket.io-client";
 import Chat from "./Chat/Chat";
 import ChatList from "./Chatlist/ChatList";
 import Empty from "./Empty";
+import SearchMessages from "./Chat/SearchMessages";
 
 function Main() {
-
   const router = useRouter();
-  const [{ userInfo, currentChatUser }, dispatch] = useStateProvider();
+  const [{ userInfo, currentChatUser, messagesSearch }, dispatch] =
+    useStateProvider();
   const [redirectLogin, setRedirectLogin] = useState(false);
   const socket = useRef();
   const [socketEvent, setSocketEvent] = useState(false);
@@ -24,8 +25,7 @@ function Main() {
     if (redirectLogin) {
       router.push("/login");
     }
-  }, [redirectLogin])
-
+  }, [redirectLogin]);
 
   onAuthStateChanged(firebaseAuth, async (currentUser) => {
     if (!currentUser) {
@@ -33,7 +33,9 @@ function Main() {
     }
 
     if (!userInfo && currentUser?.email) {
-      const { data } = await axios.post(CHECK_USER_ROUTE, { email: currentUser.email });
+      const { data } = await axios.post(CHECK_USER_ROUTE, {
+        email: currentUser.email,
+      });
 
       console.log(userInfo);
       if (!data.status) {
@@ -41,7 +43,13 @@ function Main() {
       }
 
       if (data.data) {
-        const { id, name, email, profilePicture: profileImage, status } = data.data;
+        const {
+          id,
+          name,
+          email,
+          profilePicture: profileImage,
+          status,
+        } = data.data;
         dispatch({
           type: reducerCases.SET_USER_INFO,
           userInfo: {
@@ -50,10 +58,9 @@ function Main() {
             email,
             profileImage,
             status,
-          }
+          },
         });
       }
-
     }
   });
 
@@ -66,44 +73,47 @@ function Main() {
   }, [userInfo]);
 
   useEffect(() => {
-    if(socket.current && !socketEvent)
-    {
+    if (socket.current && !socketEvent) {
       socket.current.on("msg-recieve", (data) => {
         dispatch({
-          type:reducerCases.ADD_MESSAGE, 
-          newMessage:{
+          type: reducerCases.ADD_MESSAGE,
+          newMessage: {
             ...data.message,
-          }
-        })
-      })
+          },
+        });
+      });
       setSocketEvent(true);
     }
   }, [socket.current]);
 
   useEffect(() => {
     const getMessages = async () => {
-      const { data: { messages }, } = await axios.get(
+      const {
+        data: { messages },
+      } = await axios.get(
         `${GET_MESSAGE_ROUTE}/${userInfo?.id}/${currentChatUser.id}`
       );
-      dispatch({ type: reducerCases.SET_MESSAGES, messages })
-
+      dispatch({ type: reducerCases.SET_MESSAGES, messages });
     };
 
-    if (currentChatUser?.id)
-      getMessages();
+    if (currentChatUser?.id) getMessages();
+  }, [currentChatUser]);
 
-  }, [currentChatUser])
-
-  return <>
-
-    <div className="grid grid-cols-main h-screen max-h-screen w-screen max-w-full ">
-      <ChatList />
-      {
-        currentChatUser ? <Chat /> : <Empty />
-      }
-    </div>
-
-  </>;
+  return (
+    <>
+      <div className="grid grid-cols-main h-screen max-h-screen w-screen max-w-full ">
+        <ChatList />
+        {currentChatUser ? (
+          <div className={messagesSearch ? "grid grid-cols-2" : "grid-cols-2"}>
+            <Chat />
+            {messagesSearch && <SearchMessages />}
+          </div>
+        ) : (
+          <Empty />
+        )}
+      </div>
+    </>
+  );
 }
 
 export default Main;
