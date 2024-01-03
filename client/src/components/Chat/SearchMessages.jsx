@@ -19,6 +19,9 @@ function SearchMessages() {
         )
       );
     }
+    else{
+      setSearchedMessages([]);
+    }
   }, [searchTerm]);
 
   return (

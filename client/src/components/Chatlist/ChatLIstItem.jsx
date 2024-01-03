@@ -65,7 +65,7 @@ function ChatLIstItem({ data, isContactPage = false }) {
               {isContactPage ? (
                 data?.about || "\u00a0"
               ) : (
-                <div className="flex items-center gap-1 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[200px] xl:max-w-[300px]">
+                <dixv className="flex items-center gap-1 max-w-[200px] sm:max-w-[250px] md:max-w-[300px] lg:max-w-[200px] xl:max-w-[300px]">
                   {data.senderId === userInfo.id && (
                     <MessageStatus messageStatus={data.messageStatus} />
                   )}
@@ -87,7 +87,7 @@ function ChatLIstItem({ data, isContactPage = false }) {
                       Image
                     </span>
                   )}
-                </div>
+                </dixv>
               )}
             </span>
             {data.totalUnreadMessages > 0 && (
