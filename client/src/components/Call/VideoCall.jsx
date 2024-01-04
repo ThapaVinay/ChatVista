@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 const Container = dynamic(() => import("./Container"), { ssr: false });
 
 function VideoCall() {
+  const [{ videoCall, socket, userInfo }] = useStateProvider();
+
   useEffect(() => {
     if (videoCall.type === "out-going") {
       socket.current.emit("outgoing-video-call", {
@@ -18,8 +20,6 @@ function VideoCall() {
       });
     }
   }, [videoCall]);
-
-  const [{ videoCall, socket, userInfo }] = useStateProvider();
 
   return <Container data={videoCall} />;
 }
