@@ -24,7 +24,7 @@ const server = app.listen(process.env.PORT, () => {
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://chat-vista-vt.vercel.app",
   },
 });
 
@@ -80,14 +80,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("reject-voice-call", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
+    const sendUserSocket = onlineUsers.get(data.from);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("voice-call-rejected");
     }
   });
 
   socket.on("reject-video-call", (data) => {
-    const sendUserSocket = onlineUsers.get(data.to);
+    const sendUserSocket = onlineUsers.get(data.from);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("video-call-rejected");
     }

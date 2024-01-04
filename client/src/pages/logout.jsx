@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 
 function logout() {
-  const [{ socket, userInfo }, dispatch] = useStateProvider;
+  const [{ socket, userInfo }, dispatch] = useStateProvider();
   const router = useRouter();
 
   useEffect(() => {

@@ -12,7 +12,7 @@ function Container({ data }) {
   const [token, setToken] = useState(undefined);
   const [zgVar, setZgVar] = useState(undefined);
   const [localStream, setLocalStream] = useState(undefined);
-  const [publicStream, setPublicStream] = useState(undefined);
+  const [publishStream, setPublishStream] = useState(undefined);
 
   useEffect(() => {
     if (data.type === "out-going") {
@@ -44,7 +44,7 @@ function Container({ data }) {
         async ({ ZegoExpressEngine }) => {
           const zg = new ZegoExpressEngine(
             process.env.NEXT_PUBLIC_ZEGO_APP_ID,
-            process.env.NEXT_PUBLIC_ZEGO_SERVER_SECRET
+            process.env.NEXT_PUBLIC_ZEGO_SERVER_ID
           );
           setZgVar(zg);
 
@@ -74,7 +74,7 @@ function Container({ data }) {
                 streamList[0].streamID
               ) {
                 zg.destroyStream(localStream);
-                zg.startPublishingStream(streamList[0].streamID);
+                zg.stopPublishingStream(streamList[0].streamID);
                 zg.logoutRoom(data.roomId.toString());
                 dispatch({ type: reducerCases.END_CALL });
               }
@@ -107,10 +107,11 @@ function Container({ data }) {
           videoElement.playsInline = true;
 
           localVideo.appendChild(videoElement);
+          
           const td = document.getElementById("video-local-zego");
           td.srcObject = localStream;
           const streamID = "123" + Date.now();
-          setPublicStream(streamID);
+          setPublishStream(streamID);
           setLocalStream(localStream);
           zg.startPublishingStream(streamID, localStream);
         }
@@ -123,9 +124,9 @@ function Container({ data }) {
 
   const endCall = () => {
     const id = data.id;
-    if (zgVar && localStream && publicStream) {
+    if (zgVar && localStream && publishStream) {
       zgVar.destroyStream(localStream);
-      zgVar.stopPublishingStream(publicStream);
+      zgVar.stopPublishingStream(publishStream);
       zgVar.logoutRoom(data.roomId.toString());
     }
 
@@ -166,7 +167,7 @@ function Container({ data }) {
       )}
 
       <div className="my-5 relative" id="remote-video">
-        <div className="absolute b-5 right-5" id="local-audio"></div>
+        <div className="absolute bottom-5 right-5" id="local-audio"></div>
       </div>
 
       <div className="h-16 w-16 bg-red-600 flex items-center justify-center rounded-full">
