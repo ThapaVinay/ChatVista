@@ -9,6 +9,18 @@ function Container({ data }) {
   const [callAccepted, setCallAccepted] = useState(false);
 
   const endCall = () => {
+    const id = data.id;
+
+    if (data.callType === "voice") {
+      socket.current.emit("reject-voice-call", {
+        from: id,
+      });
+    } else {
+      socket.current.emit("reject-video-call", {
+        from: id,
+      });
+    }
+
     dispatch({ type: reducerCases.END_CALL });
   };
 

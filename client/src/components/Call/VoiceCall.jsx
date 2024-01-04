@@ -8,11 +8,11 @@ function VoiceCall() {
 
   useEffect(() => {
     if (voiceCall.type === "out-going") {
-      socket.current.emit("ourgoing-voice-call", {
+      socket.current.emit("outgoing-voice-call", {
         to: voiceCall.id,
         from: {
           id: userInfo.id,
-          profilePicture: userInfo.profilePicture,
+          profilePicture: userInfo.profileImage,
           name: userInfo.name,
         },
         callType: voiceCall.callType,
